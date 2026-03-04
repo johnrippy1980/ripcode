@@ -16,7 +16,7 @@ const {
 const { isFirstRun, markFirstRunComplete } = require('../src/firstrun');
 const { getHolidayMessage } = require('../src/holidays');
 
-const VERSION = '0.2.1';
+const VERSION = '0.3.0';
 
 const BANNER = `
    ____  _       ____          _
@@ -94,6 +94,15 @@ function main() {
     case 'repl': return cmdRepl();
     case 'sacrifice': return cmdSacrifice(args.slice(1));
     case 'resurrect': return cmdResurrect(args.slice(1));
+    case 'fortune': return cmdFortune();
+    case 'rage': return cmdRage(args.slice(1));
+    case 'summon-kenny-g': return cmdKennyG();
+    case 'roast': return cmdRoast(args.slice(1));
+    case 'headcount': return cmdHeadcount();
+    case 'rip':
+      // "rip rip" = 2nd rip, check for 3rd
+      if (args[1] === 'rip') return cmdBeetlejuice();
+      // fall through
     default:
       // If it's a .rip file, treat as `run`
       if (command.endsWith('.rip')) return cmdRun(args);
@@ -824,6 +833,263 @@ function cmdResurrect(args) {
   console.log('');
   console.log(`\x1b[32m  "${targetName}" has returned from the dead.\x1b[0m`);
   console.log(`\x1b[2m  Restored to: ${restorePath}\x1b[0m`);
+  console.log('');
+}
+
+// ============================================================
+//  rip fortune — metal fortune cookie
+// ============================================================
+
+const FORTUNES = [
+  'Your next merge conflict will be resolved by violence.',
+  'The compiler smiles upon you today.',
+  'A stranger will open an issue on your repo. It will be valid.',
+  'You will refactor something that didn\'t need refactoring.',
+  'Your code works. Do not question why.',
+  'A segfault approaches from the east. Bring snacks.',
+  'Today you will discover a bug you wrote 6 months ago.',
+  'The tests pass locally. They will not pass in CI.',
+  'An unexpected NaN will bring unexpected clarity.',
+  'You will add a dependency you will regret.',
+  'npm audit will find 47 vulnerabilities. This is fine.',
+  'Your pull request will be approved by someone who didn\'t read it.',
+  'Somewhere, a junior dev is importing lodash for Array.map.',
+  'The void stares back. It has a type error.',
+  'You will write a TODO comment. It will outlive you.',
+  'A promise will be rejected. Like your last PR.',
+  'The pipeline flows. Trust the pipeline.',
+  'Tabs and spaces will never know peace. Neither will you.',
+  'You will Google the same regex for the 100th time.',
+  'The docs are lying. They have always been lying.',
+  'Your function will work on the first try. Be suspicious.',
+  'Semicolons are a myth perpetuated by Big Linter.',
+  'You will mass-rename a variable and break 12 files.',
+  'Stack Overflow has the answer. The question is from 2014.',
+  'rm -rf will solve your problem. And create 7 new ones.',
+  'A production deployment approaches. It is Friday at 4:59.',
+  'Your code review comment will be ignored. Write it anyway.',
+  'Someone will ask "can we just use a regex for this?"',
+  'The CSS will center on your machine. Only your machine.',
+  'Embrace the spaghetti. Become the spaghetti.',
+  'Your environment variables are showing. Cover yourself.',
+  'A race condition lurks. It only appears in demos.',
+  'You will spend 4 hours on a bug caused by a typo.',
+  'The intern will push to main. The alarms will sound.',
+  'Your gitignore is missing something important. Good luck.',
+  'Tonight, the node_modules folder grows heavier.',
+  'A wild undefined appears. It\'s super effective.',
+  'You will copy code from a tutorial. The tutorial is wrong.',
+  'The linter wants you to change. You are not ready.',
+  'console.log debugging is not shameful. It is tradition.',
+  'Your commit message will say "fix". It fixes nothing.',
+  'An O(n²) loop judges you silently.',
+  'You will use !important in CSS. You will not feel important.',
+  'Somewhere, a Docker container is running that nobody remembers starting.',
+  'The sprint will not be completed. It was never going to be.',
+  'A callback from the past calls. You forgot to handle the error.',
+  'Your API key is in the commit history. It has always been.',
+  'You will mass-delete console.logs before a PR review.',
+  'The real treasure was the bugs we shipped along the way.',
+  'Shred today, for tomorrow we deploy.',
+];
+
+function cmdFortune() {
+  const fortune = FORTUNES[Math.floor(Math.random() * FORTUNES.length)];
+  console.log('');
+  console.log('\x1b[33m  \u{1F52E} METAL FORTUNE \u{1F52E}\x1b[0m');
+  console.log('');
+  console.log(`\x1b[2m  "${fortune}"\x1b[0m`);
+  console.log('');
+}
+
+// ============================================================
+//  rip rage <message> — escalating ASCII rage
+// ============================================================
+
+function cmdRage(args) {
+  if (args.length === 0) {
+    console.error('Usage: rip rage <message>');
+    process.exit(1);
+  }
+
+  const words = args.join(' ').split(/\s+/);
+  console.log('');
+
+  const styles = [
+    (w) => `\x1b[37m  ${w}\x1b[0m`,
+    (w) => `\x1b[37m\x1b[1m  ${w.toUpperCase()}\x1b[0m`,
+    (w) => `\x1b[33m\x1b[1m  * ${w.toUpperCase()} *\x1b[0m`,
+    (w) => `\x1b[31m\x1b[1m  ** ${w.toUpperCase()} **\x1b[0m`,
+    (w) => `\x1b[31m\x1b[1m  >>> ${w.toUpperCase()} <<<\x1b[0m`,
+    (w) => `\x1b[31m\x1b[1m  !!!  ${w.toUpperCase()}  !!!\x1b[0m`,
+    (w) => `\x1b[31m\x1b[1m\x1b[5m  \u{1F525}\u{1F480} ${w.toUpperCase()} \u{1F480}\u{1F525}\x1b[0m`,
+  ];
+
+  for (let i = 0; i < words.length; i++) {
+    const level = Math.min(i, styles.length - 1);
+    console.log(styles[level](words[i]));
+    sleep(150);
+  }
+
+  if (words.length >= 3) {
+    console.log('');
+    console.log('\x1b[31m  \\m/ >_< \\m/  RAGE COMPLETE\x1b[0m');
+  }
+  console.log('');
+}
+
+// ============================================================
+//  rip summon-kenny-g — the ultimate punishment
+// ============================================================
+
+function cmdKennyG() {
+  console.log('');
+  console.log('\x1b[31m\x1b[1m  You have angered the metal gods.\x1b[0m');
+  sleep(800);
+  console.log('');
+  console.log('\x1b[33m\x1b[1m  Kenny G has been summoned.\x1b[0m');
+  sleep(600);
+  console.log('');
+  console.log('\x1b[2m       ,_,');
+  console.log('      (o,o)');
+  console.log('      {`"`)');
+  console.log('      -"-"-\x1b[0m');
+  console.log('');
+  console.log('\x1b[2m  \u{1F3B7} *smooth jazz plays softly* \u{1F3B7}\x1b[0m');
+  sleep(500);
+  console.log('');
+  console.log('\x1b[2m  Your distortion pedal weeps.\x1b[0m');
+  console.log('\x1b[2m  Your gain knob turns itself to zero.\x1b[0m');
+  console.log('\x1b[2m  Somewhere, a Marshall amp unplugs itself.\x1b[0m');
+  console.log('');
+  sleep(500);
+  console.log('\x1b[33m  To undo this curse, type: rip solo\x1b[0m');
+  console.log('');
+}
+
+// ============================================================
+//  rip roast <file> — code roast based on metrics
+// ============================================================
+
+function cmdRoast(args) {
+  if (args.length === 0) {
+    console.error('Usage: rip roast <file.rip>');
+    process.exit(1);
+  }
+
+  const filePath = path.resolve(args[0]);
+  if (!fs.existsSync(filePath)) {
+    console.error(`\x1b[31m  Can't roast what doesn't exist: ${filePath}\x1b[0m`);
+    process.exit(1);
+  }
+
+  const src = fs.readFileSync(filePath, 'utf-8');
+  const lines = src.split('\n');
+  const loc = lines.length;
+  const functions = (src.match(/\briff\b/g) || []).length;
+  const pipelines = (src.match(/~>/g) || []).length;
+  const screams = (src.match(/\bscream\b/g) || []).length;
+  const says = (src.match(/\bsay\b/g) || []).length;
+  const whispers = (src.match(/\bwhisper\b/g) || []).length;
+  const comments = (src.match(/\/\//g) || []).length;
+  const loops = (src.match(/\bshred\b/g) || []).length + (src.match(/\bwhile\b/g) || []).length;
+  const braces = (src.match(/\bbrace\b/g) || []).length;
+
+  const fileName = path.basename(filePath);
+  const roasts = [];
+
+  console.log('');
+  console.log('\x1b[31m\x1b[1m  CODE ROAST: ' + fileName + '\x1b[0m');
+  console.log('\x1b[2m  ────────────────────────────────\x1b[0m');
+  console.log('');
+
+  if (loc < 5) roasts.push('This file has fewer lines than a haiku. And less meaning.');
+  if (loc > 200) roasts.push(`${loc} lines? This isn't a file, it's a novel. Nobody's reading this.`);
+
+  if (functions === 0) roasts.push('Zero functions. Just raw, unstructured chaos. Bold.');
+  if (functions > 15) roasts.push(`${functions} functions in one file? Ever heard of modules?`);
+  if (functions === 1) roasts.push('One function. The loneliest riff ever played.');
+
+  if (pipelines === 0) roasts.push('0 pipelines? Do you even shred?');
+  if (pipelines > 10) roasts.push(`${pipelines} pipelines. We get it, you pipe.`);
+
+  if (screams === 0 && says > 5) roasts.push('All say, no scream. Where is the passion?');
+  if (screams > says) roasts.push('More screams than says. You okay?');
+  if (whispers > 3) roasts.push(`${whispers} whispers? This code has trust issues.`);
+
+  if (comments === 0) roasts.push('Zero comments. Either genius or chaos. I\'m betting chaos.');
+  if (comments > loc * 0.4) roasts.push('More comments than code. Just write a blog post.');
+
+  if (loops === 0) roasts.push('No loops. This code runs in a straight line and falls off a cliff.');
+  if (braces === 0) roasts.push('No error handling. You live dangerously. Respect.');
+  if (braces > 5) roasts.push(`${braces} brace/recover blocks? What are you even doing that's this risky?`);
+
+  if (src.includes('meaning_of_life') && !src.includes('42')) roasts.push('You defined the meaning of life and got it wrong. Typical.');
+
+  // Always have at least one
+  if (roasts.length === 0) roasts.push('Honestly? Not bad. But I\'m still judging you.');
+
+  for (const roast of roasts) {
+    console.log(`\x1b[33m  \u{1F525} ${roast}\x1b[0m`);
+    sleep(300);
+  }
+
+  console.log('');
+  console.log(`\x1b[2m  Score: ${loc} lines, ${functions} riffs, ${pipelines} pipes, ${screams} screams\x1b[0m`);
+  console.log('');
+}
+
+// ============================================================
+//  rip headcount — how many easter eggs exist
+// ============================================================
+
+function cmdHeadcount() {
+  const total = 33;
+  const known = [
+    'rip solo', 'rip lore', 'rip noise', 'rip 666', 'rip credits',
+    'rip unleash', 'rip quake', 'rip hierarchy', 'rip battle',
+    'rip repl', 'rip sacrifice', 'rip resurrect', 'rip fortune',
+    'rip rage', 'rip summon-kenny-g', 'rip roast', 'rip headcount',
+  ];
+  const hidden = total - known.length;
+
+  console.log('');
+  console.log('\x1b[35m\x1b[1m  EASTER EGG HEADCOUNT\x1b[0m');
+  console.log('');
+  console.log(`\x1b[36m  Commands you could find:    ${known.length}\x1b[0m`);
+  console.log(`\x1b[33m  Hidden surprises:           ${hidden}\x1b[0m`);
+  console.log(`\x1b[31m  Total secrets:              ${total}\x1b[0m`);
+  console.log('');
+  console.log('\x1b[2m  You\'ve found "headcount". That\'s 1 of ' + total + '.\x1b[0m');
+  console.log('\x1b[2m  Keep digging. \\m/\x1b[0m');
+  console.log('');
+}
+
+// ============================================================
+//  rip rip rip — Beetlejuice mode
+// ============================================================
+
+function cmdBeetlejuice() {
+  console.log('');
+  console.log('\x1b[32m\x1b[1m  You said it three times.\x1b[0m');
+  sleep(500);
+  console.log('');
+  console.log('\x1b[33m\x1b[1m  B E E T L E J U I C E\x1b[0m');
+  sleep(300);
+  console.log('\x1b[33m\x1b[1m  B E E T L E J U I C E\x1b[0m');
+  sleep(300);
+  console.log('\x1b[33m\x1b[1m  B E E T L E J U I C E\x1b[0m');
+  sleep(500);
+  console.log('');
+  console.log('\x1b[35m      _    _');
+  console.log('     ( \\__/ )');
+  console.log('      \\\' _ \'/ ');
+  console.log('      /    \\');
+  console.log('     | (\\)(/) |');
+  console.log('      \\    /');
+  console.log('       \\__/\x1b[0m');
+  console.log('');
+  console.log('\x1b[32m  "It\'s showtime!"\x1b[0m');
   console.log('');
 }
 
