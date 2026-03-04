@@ -1,0 +1,33 @@
+// pipeline.rip — Data pipeline with ~> operator
+
+riff double(x) -> x * 2
+riff addTen(x) -> x + 10
+riff square(x) -> x * x
+
+// Simple pipeline
+forge result = 5 ~> double ~> addTen ~> square
+say "5 -> double -> addTen -> square ="
+say result
+
+// Pipeline with string manipulation
+riff shout(s) -> s + "!!!"
+riff wrap(s) -> "[" + s + "]"
+
+forge message = "ripcode" ~> shout ~> wrap
+say message
+
+// Chained math
+forge nums = [1, 2, 3, 4, 5]
+
+riff sumAll(arr) {
+  forge total = 0
+  shred arr as n {
+    total = total + n
+  }
+  return total
+}
+
+riff doubleIt(n) -> n * 2
+
+forge total = nums ~> sumAll ~> doubleIt
+say "Sum of [1..5] doubled: ${total}"

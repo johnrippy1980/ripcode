@@ -1,0 +1,31 @@
+// mosh.rip — Concurrency demo
+
+riff delay(ms) {
+  return ms
+}
+
+// Simulate concurrent tasks
+say "Starting mosh pit..."
+
+forge task1 = delay(100)
+forge task2 = delay(200)
+forge task3 = delay(300)
+
+say "Task results: ${task1}, ${task2}, ${task3}"
+say "All tasks completed!"
+
+// Loop + conditionals
+forge scores = [95, 82, 67, 91, 54, 78]
+
+say "--- Grade Report ---"
+shred scores as score {
+  if score >= 90 {
+    say "${score}: A (shredding it!)"
+  } else if score >= 80 {
+    say "${score}: B (solid riff)"
+  } else if score >= 70 {
+    say "${score}: C (keeping tempo)"
+  } else {
+    yell "${score}: needs more practice"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "name": "ripcode",
+  "version": "0.1.0",
+  "description": "RipCode — a destructive-first programming language that transpiles to JavaScript 🤘",
+  "main": "src/transpiler.js",
+  "bin": {
+    "rip": "./bin/rip.js",
+    "ripcode": "./bin/rip.js"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "examples/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "language",
+    "transpiler",
+    "programming-language",
+    "metal",
+    "cyberpunk",
+    "compiler",
+    "esoteric",
+    "javascript",
+    "pipeline",
+    "destructuring"
+  ],
+  "author": "johnrippy80",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnrippy1980/ripcode.git"
+  },
+  "homepage": "https://github.com/johnrippy1980/ripcode#readme",
+  "bugs": {
+    "url": "https://github.com/johnrippy1980/ripcode/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

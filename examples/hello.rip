@@ -1,0 +1,26 @@
+// hello.rip — RipCode noise levels demo
+
+whisper "This is a whisper... barely audible"
+say "This is a normal say — the default output"
+yell "This is a YELL — warning level"
+scream "THIS IS A SCREAM — something broke!"
+
+// Variables
+forge name = "RipCode"
+forge version = 0.1
+lock MOTTO = "Rip it. Ship it."
+
+say "Welcome to ${name} v${version}"
+say MOTTO
+
+// Math
+forge x = 10
+forge y = 20
+forge sum = x + y
+say "Sum: ${sum}"
+
+// Boolean logic
+forge isLoud = true
+if isLoud {
+  scream "MAXIMUM VOLUME!"
+}

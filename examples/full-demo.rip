@@ -1,0 +1,77 @@
+// full-demo.rip — Complete RipCode showcase
+
+// === Constants & Variables ===
+lock BAND_NAME = "The Transpilers"
+lock MAX_VOLUME = 11
+forge currentTrack = 1
+
+// === Functions (Riffs) ===
+riff greet(name) -> "Welcome to the show, ${name}!"
+
+riff makeSetlist(songs) {
+  forge setlist = []
+  forge i = 0
+  shred songs as song {
+    i = i + 1
+    forge entry = "${i}. ${song}"
+    setlist = setlist + [entry]  // Note: conceptual array concat
+  }
+  return setlist
+}
+
+riff volumeCheck(level) {
+  if level > MAX_VOLUME {
+    scream "Volume exceeds max! Feedback loop incoming!"
+    return MAX_VOLUME
+  }
+  return level
+}
+
+// === Main Flow ===
+say greet("RipCode Dev")
+say "Band: ${BAND_NAME}"
+
+// Destructuring
+forge config = { venue: "The Pit", capacity: 500, soldOut: true }
+rip venue, capacity, soldOut from config
+say "Venue: ${venue} (capacity: ${capacity})"
+
+if soldOut {
+  yell "SOLD OUT!"
+}
+
+// Pipeline
+riff double(x) -> x * 2
+riff addOne(x) -> x + 1
+
+forge answer = 20 ~> double ~> addOne
+say "The answer is: ${answer}"
+
+// Shred loop
+forge tracks = ["Rip It", "Forge Ahead", "Shred Solo", "Drop the Bass"]
+say "--- Setlist ---"
+shred tracks as track {
+  say "Track ${currentTrack}: ${track}"
+  currentTrack = currentTrack + 1
+}
+
+// Lambda
+forge transform = |x| -> x * x
+say "Lambda 5^2 = ${transform(5)}"
+
+// Error handling
+brace {
+  forge vol = volumeCheck(15)
+  say "Volume set to: ${vol}"
+} recover err {
+  scream "Error: ${err}"
+}
+
+// While loop
+forge countdown = 3
+say "--- Countdown ---"
+while countdown > 0 {
+  say "${countdown}..."
+  countdown = countdown - 1
+}
+say "GO!"
