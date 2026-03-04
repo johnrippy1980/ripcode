@@ -14,7 +14,7 @@ const {
 } = require('../src/ascii');
 const { isFirstRun, markFirstRunComplete } = require('../src/firstrun');
 
-const VERSION = '0.1.1';
+const VERSION = '0.1.2';
 
 const BANNER = `
    ____  _       ____          _
@@ -71,6 +71,7 @@ function main() {
     case 'noise': return cmdNoise();
     case '666': return cmd666();
     case 'credits': return cmdCredits();
+    case 'unleash': return cmdUnleash();
     default:
       // If it's a .rip file, treat as `run`
       if (command.endsWith('.rip')) return cmdRun(args);
@@ -234,6 +235,33 @@ function cmdCredits() {
     console.log(line);
     sleep(300);
   }
+}
+
+function cmdUnleash() {
+  const url = 'https://actor-arsenal-site.vercel.app/';
+  console.log('');
+  console.log('\x1b[31m\x1b[1m  Unleashing the arsenal...\x1b[0m');
+  console.log('');
+  console.log('\x1b[33m     \\m/  \\m/  \\m/  \\m/  \\m/\x1b[0m');
+  console.log('');
+  console.log(`\x1b[2m  Opening: ${url}\x1b[0m`);
+  console.log('');
+
+  // Cross-platform browser open
+  const { platform } = process;
+  try {
+    if (platform === 'darwin') {
+      execSync(`open "${url}"`, { stdio: 'ignore' });
+    } else if (platform === 'win32') {
+      execSync(`start "" "${url}"`, { stdio: 'ignore' });
+    } else {
+      execSync(`xdg-open "${url}"`, { stdio: 'ignore' });
+    }
+    console.log('\x1b[32m  Volume up. \\m/\x1b[0m');
+  } catch {
+    console.log(`\x1b[2m  Couldn't open browser. Visit manually: ${url}\x1b[0m`);
+  }
+  console.log('');
 }
 
 main();

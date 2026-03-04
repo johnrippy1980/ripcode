@@ -1,6 +1,6 @@
 {
   "name": "ripcode",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "RipCode — a destructive-first programming language that transpiles to JavaScript 🤘",
   "main": "src/transpiler.js",
   "bin": {
