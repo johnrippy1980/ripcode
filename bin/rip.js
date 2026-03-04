@@ -56,6 +56,14 @@ function main() {
   const holiday = getHolidayMessage();
   if (holiday) {
     holiday.message.forEach(line => console.log(line));
+    if (holiday.url) {
+      try {
+        const { platform } = process;
+        if (platform === 'darwin') execSync(`open "${holiday.url}"`, { stdio: 'ignore' });
+        else if (platform === 'win32') execSync(`start "" "${holiday.url}"`, { stdio: 'ignore' });
+        else execSync(`xdg-open "${holiday.url}"`, { stdio: 'ignore' });
+      } catch {}
+    }
   }
 
   if (!command || command === 'help') {

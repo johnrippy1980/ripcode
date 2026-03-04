@@ -15,6 +15,7 @@ function getHolidayMessage() {
   if (month === 12 && day === 25) {
     return {
       type: 'christmas',
+      url: 'https://youtube.com/shorts/MKLNG2koneU',
       message: [
         '',
         '\x1b[32m\x1b[1m  \u{1F384} Merry Christmas from RipCode \u{1F384}\x1b[0m',
