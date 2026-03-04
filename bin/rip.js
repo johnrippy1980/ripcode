@@ -3,7 +3,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
+const https = require('https');
 const { tokenize } = require('../src/lexer');
 const { parse } = require('../src/parser');
 const { transpile } = require('../src/transpiler');
@@ -14,7 +15,7 @@ const {
 } = require('../src/ascii');
 const { isFirstRun, markFirstRunComplete } = require('../src/firstrun');
 
-const VERSION = '0.1.2';
+const VERSION = '0.1.3';
 
 const BANNER = `
    ____  _       ____          _
@@ -72,6 +73,7 @@ function main() {
     case '666': return cmd666();
     case 'credits': return cmdCredits();
     case 'unleash': return cmdUnleash();
+    case 'quake': return cmdQuake();
     default:
       // If it's a .rip file, treat as `run`
       if (command.endsWith('.rip')) return cmdRun(args);
@@ -262,6 +264,97 @@ function cmdUnleash() {
     console.log(`\x1b[2m  Couldn't open browser. Visit manually: ${url}\x1b[0m`);
   }
   console.log('');
+}
+
+function cmdQuake() {
+  if (process.platform !== 'darwin') {
+    console.log('\x1b[33m  Music playback requires macOS. Opening the site instead...\x1b[0m');
+    const url = 'https://zapier-quake-site.vercel.app/';
+    try {
+      if (process.platform === 'win32') {
+        execSync(`start "" "${url}"`, { stdio: 'ignore' });
+      } else {
+        execSync(`xdg-open "${url}"`, { stdio: 'ignore' });
+      }
+    } catch {
+      console.log(`\x1b[2m  Visit: ${url}\x1b[0m`);
+    }
+    return;
+  }
+
+  const os = require('os');
+  const ripcodeDir = path.join(os.homedir(), '.ripcode');
+  const audioFile = path.join(ripcodeDir, 'quake-theme.mp3');
+  const audioUrl = 'https://zapier-quake-site.vercel.app/audio/quake-theme.mp3';
+
+  console.log('');
+  console.log('\x1b[33m\x1b[1m  ===============================\x1b[0m');
+  console.log('\x1b[33m\x1b[1m   Q U A K E   T H E M E\x1b[0m');
+  console.log('\x1b[33m\x1b[1m   Nine Inch Nails / Trent Reznor\x1b[0m');
+  console.log('\x1b[33m\x1b[1m  ===============================\x1b[0m');
+  console.log('');
+
+  if (fs.existsSync(audioFile)) {
+    playQuakeTheme(audioFile);
+    return;
+  }
+
+  // Download on first use
+  console.log('\x1b[2m  Downloading theme (first time only)...\x1b[0m');
+  if (!fs.existsSync(ripcodeDir)) fs.mkdirSync(ripcodeDir, { recursive: true });
+
+  const file = fs.createWriteStream(audioFile);
+  const request = (url) => {
+    https.get(url, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        request(res.headers.location);
+        return;
+      }
+      if (res.statusCode !== 200) {
+        console.log(`\x1b[31m  Download failed (HTTP ${res.statusCode})\x1b[0m`);
+        try { fs.unlinkSync(audioFile); } catch {}
+        return;
+      }
+      const total = parseInt(res.headers['content-length'], 10);
+      let downloaded = 0;
+      res.on('data', (chunk) => {
+        downloaded += chunk.length;
+        file.write(chunk);
+        if (total) {
+          const pct = Math.round((downloaded / total) * 100);
+          process.stdout.write(`\r\x1b[2m  Downloading... ${pct}%\x1b[0m`);
+        }
+      });
+      res.on('end', () => {
+        file.end();
+        console.log('\r\x1b[2m  Download complete.       \x1b[0m');
+        playQuakeTheme(audioFile);
+      });
+    }).on('error', (err) => {
+      console.log(`\x1b[31m  Download error: ${err.message}\x1b[0m`);
+      try { fs.unlinkSync(audioFile); } catch {}
+    });
+  };
+  request(audioUrl);
+}
+
+function playQuakeTheme(audioFile) {
+  console.log('\x1b[35m  Playing... (Ctrl+C to stop)\x1b[0m');
+  console.log('');
+  console.log('\x1b[2m  \\m/ >_< \\m/\x1b[0m');
+  console.log('');
+
+  const player = spawn('afplay', [audioFile], { stdio: 'ignore' });
+
+  process.on('SIGINT', () => {
+    player.kill();
+    console.log('\n\x1b[2m  Theme stopped. Silence falls.\x1b[0m');
+    process.exit(0);
+  });
+
+  player.on('close', () => {
+    console.log('\x1b[2m  Track ended.\x1b[0m');
+  });
 }
 
 main();
