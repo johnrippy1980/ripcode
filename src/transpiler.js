@@ -7,6 +7,7 @@ class Transpiler {
     this.indent = 0;
     this.needsRuntime = false;
     this.runtimeFeatures = new Set();
+    this.previousStatement = null;
   }
 
   transpile(ast) {
@@ -22,7 +23,9 @@ class Transpiler {
       header = `const { ${features.join(', ')} } = require('${path.join(__dirname, 'runtime').replace(/\\/g, '/')}');\n\n`;
     }
 
-    return header + body + '\n';
+    const footer = '\n// Forged with RipCode \u{1F918}\n';
+
+    return header + body + footer;
   }
 
   pad() {
@@ -36,7 +39,14 @@ class Transpiler {
 
   emitNode(node) {
     if (!node) return '';
+    const result = this._emitNodeInner(node);
+    if (node.type !== 'EncoreStmt') {
+      this.previousStatement = result;
+    }
+    return result;
+  }
 
+  _emitNodeInner(node) {
     switch (node.type) {
       case 'Program': return node.body.map(n => this.emitNode(n)).join('\n');
       case 'ForgeDecl': return this.emitForge(node);
@@ -52,6 +62,10 @@ class Transpiler {
       case 'GrabStmt': return this.emitGrab(node);
       case 'DropStmt': return this.emitDrop(node);
       case 'ReturnStatement': return this.emitReturn(node);
+      case 'EncoreStmt': return this.emitEncore(node);
+      case 'HeadbangStmt': return this.emitHeadbang(node);
+      case 'SummonStmt': return this.emitSummon(node);
+      case 'BattlecryStmt': return this.emitBattlecry(node);
       case 'ExpressionStatement': return `${this.pad()}${this.emitExpr(node.expression)};`;
       case 'Block': return this.emitBlock(node);
       default: return `${this.pad()}${this.emitExpr(node)};`;
@@ -59,11 +73,13 @@ class Transpiler {
   }
 
   emitForge(node) {
-    return `${this.pad()}let ${node.name} = ${this.emitExpr(node.value)};`;
+    const mol = this._meaningOfLife(node);
+    return `${this.pad()}let ${node.name} = ${this.emitExpr(node.value)};${mol}`;
   }
 
   emitLock(node) {
-    return `${this.pad()}const ${node.name} = ${this.emitExpr(node.value)};`;
+    const mol = this._meaningOfLife(node);
+    return `${this.pad()}const ${node.name} = ${this.emitExpr(node.value)};${mol}`;
   }
 
   emitRip(node) {
@@ -168,6 +184,31 @@ class Transpiler {
     return `${this.pad()}return ${this.emitExpr(node.value)};`;
   }
 
+  emitEncore(node) {
+    if (this.previousStatement) {
+      return `${this.previousStatement} /* encore! */`;
+    }
+    return `${this.pad()}/* encore — nothing to repeat */`;
+  }
+
+  emitHeadbang(node) {
+    return `${this.pad()}/* *headbangs* */`;
+  }
+
+  emitSummon(node) {
+    if (node.destructured) {
+      return `${this.pad()}const { ${node.imports.join(', ')} } = require('${node.module}'); /* summoned from the void */`;
+    }
+    if (node.imports.length === 1) {
+      return `${this.pad()}const ${node.imports[0]} = require('${node.module}'); /* summoned from the void */`;
+    }
+    return `${this.pad()}const { ${node.imports.join(', ')} } = require('${node.module}'); /* summoned from the void */`;
+  }
+
+  emitBattlecry(node) {
+    return `${this.pad()}// BATTLE CRY: ${node.text.toUpperCase()}`;
+  }
+
   emitBlock(node) {
     const inner = this.emitBlockInner(node);
     return `${this.pad()}{\n${inner}\n${this.pad()}}`;
@@ -178,6 +219,15 @@ class Transpiler {
     const lines = block.body.map(n => this.emitNode(n)).filter(Boolean).join('\n');
     this.indent--;
     return lines;
+  }
+
+  _meaningOfLife(node) {
+    if (node.name && node.name.includes('meaning_of_life')) {
+      if (node.value && node.value.type === 'NumericLiteral' && node.value.value !== 42) {
+        return ' /* are you sure? */';
+      }
+    }
+    return '';
   }
 
   // Expression emitters

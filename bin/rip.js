@@ -8,8 +8,13 @@ const { tokenize } = require('../src/lexer');
 const { parse } = require('../src/parser');
 const { transpile } = require('../src/transpiler');
 const { RipCodeError } = require('../src/errors');
+const {
+  SOLO_FRAMES, HORNS_666, CREDITS, LORE_TEXT, NOISE_BARS,
+  WELCOME, VERSION_TAGLINES, GOLDEN_BANNER, BUILD_CELEBRATIONS,
+} = require('../src/ascii');
+const { isFirstRun, markFirstRunComplete } = require('../src/firstrun');
 
-const VERSION = '0.1.0';
+const VERSION = '0.1.1';
 
 const BANNER = `
    ____  _       ____          _
@@ -30,12 +35,28 @@ Usage:
   rip help                      Show this message
 `;
 
+function sleep(ms) {
+  const end = Date.now() + ms;
+  while (Date.now() < end) { /* busy wait for sync animation */ }
+}
+
 function main() {
   const args = process.argv.slice(2);
   const command = args[0];
 
+  // First-run welcome (one-time)
+  if (isFirstRun()) {
+    console.log(WELCOME);
+    markFirstRunComplete();
+  }
+
   if (!command || command === 'help') {
-    console.log(BANNER);
+    // 1/50 chance golden banner
+    if (Math.random() < 0.02) {
+      console.log(GOLDEN_BANNER);
+    } else {
+      console.log(BANNER);
+    }
     console.log(USAGE);
     return;
   }
@@ -45,6 +66,11 @@ function main() {
     case 'build': return cmdBuild(args.slice(1));
     case 'init': return cmdInit(args.slice(1));
     case 'version': return cmdVersion();
+    case 'solo': return cmdSolo();
+    case 'lore': return cmdLore();
+    case 'noise': return cmdNoise();
+    case '666': return cmd666();
+    case 'credits': return cmdCredits();
     default:
       // If it's a .rip file, treat as `run`
       if (command.endsWith('.rip')) return cmdRun(args);
@@ -121,6 +147,12 @@ function cmdBuild(args) {
 
   fs.writeFileSync(outPath, js);
   console.log(`\x1b[32m\u{1F918} Built:\x1b[0m ${outPath}`);
+
+  // 20% chance build celebration
+  if (Math.random() < 0.2) {
+    const msg = BUILD_CELEBRATIONS[Math.floor(Math.random() * BUILD_CELEBRATIONS.length)];
+    console.log(`\x1b[35m${msg}\x1b[0m`);
+  }
 }
 
 function cmdInit(args) {
@@ -153,7 +185,55 @@ function cmdInit(args) {
 }
 
 function cmdVersion() {
+  const tagline = VERSION_TAGLINES[Math.floor(Math.random() * VERSION_TAGLINES.length)];
   console.log(`RipCode v${VERSION}`);
+  console.log(`\x1b[2m${tagline}\x1b[0m`);
+}
+
+function cmdSolo() {
+  for (const frame of SOLO_FRAMES) {
+    process.stdout.write('\x1b[2J\x1b[H'); // clear screen
+    console.log(frame);
+    sleep(500);
+  }
+  console.log('\x1b[32m  Solo complete. The crowd goes wild.\x1b[0m\n');
+}
+
+function cmdLore() {
+  const text = LORE_TEXT;
+  for (let i = 0; i < text.length; i++) {
+    process.stdout.write(text[i]);
+    if (text[i] !== ' ' && text[i] !== '\x1b') {
+      sleep(20);
+    }
+    // Skip ANSI escape sequence delays
+    if (text[i] === '\x1b') {
+      while (i < text.length && text[i] !== 'm') {
+        i++;
+        process.stdout.write(text[i]);
+      }
+    }
+  }
+  console.log('');
+}
+
+function cmdNoise() {
+  console.log('\n\x1b[1m  NOISE LEVELS\x1b[0m\n');
+  for (const bar of NOISE_BARS) {
+    console.log(bar);
+  }
+  console.log('');
+}
+
+function cmd666() {
+  console.log(HORNS_666);
+}
+
+function cmdCredits() {
+  for (const line of CREDITS) {
+    console.log(line);
+    sleep(300);
+  }
 }
 
 main();

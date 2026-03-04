@@ -33,6 +33,15 @@ class RipCodeError extends Error {
     const theme = THEMES[this.type] || THEMES.TRACK_SCRATCHED;
     const lines = [];
 
+    // Skull art on line-1 errors
+    if (this.line === 1) {
+      lines.push(`${RED}    _____`);
+      lines.push(`   /     \\`);
+      lines.push(`  | () () |`);
+      lines.push(`   \\  ^  /`);
+      lines.push(`    |||||${RESET}`);
+    }
+
     lines.push('');
     lines.push(`${RED}${BOLD}${theme.emoji} ${theme.label}${RESET}${DIM} (${theme.desc})${RESET}`);
 

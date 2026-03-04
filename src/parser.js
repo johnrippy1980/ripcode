@@ -87,6 +87,10 @@ class Parser {
       case TokenType.GRAB: return this.parseGrab();
       case TokenType.DROP: return this.parseDrop();
       case TokenType.RETURN: return this.parseReturn();
+      case TokenType.ENCORE: return this.parseEncore();
+      case TokenType.HEADBANG: return this.parseHeadbang();
+      case TokenType.SUMMON: return this.parseSummon();
+      case TokenType.BATTLECRY: return this.parseBattlecry();
       default: {
         const expr = this.parseExpression();
         this.consumeStatementEnd();
@@ -317,6 +321,53 @@ class Parser {
     }
     this.consumeStatementEnd();
     return { type: 'ReturnStatement', value, line: token.line };
+  }
+
+  // encore — repeats previous statement
+  parseEncore() {
+    const token = this.advance(); // consume 'encore'
+    this.consumeStatementEnd();
+    return { type: 'EncoreStmt', line: token.line };
+  }
+
+  // headbang — no-op statement
+  parseHeadbang() {
+    const token = this.advance(); // consume 'headbang'
+    this.consumeStatementEnd();
+    return { type: 'HeadbangStmt', line: token.line };
+  }
+
+  // summon { x } from "module" — alt syntax for grab
+  parseSummon() {
+    const token = this.advance(); // consume 'summon'
+    const imports = [];
+    let destructured = false;
+
+    if (this.match(TokenType.LBRACE)) {
+      destructured = true;
+      imports.push(this.expect(TokenType.IDENTIFIER, "Expected import name").value);
+      while (this.match(TokenType.COMMA)) {
+        this.skipNewlines();
+        if (this.peek().type === TokenType.RBRACE) break;
+        imports.push(this.expect(TokenType.IDENTIFIER, "Expected import name").value);
+      }
+      this.expect(TokenType.RBRACE, "Expected '}'");
+    } else {
+      imports.push(this.expect(TokenType.IDENTIFIER, "Expected import name").value);
+    }
+
+    this.expect(TokenType.FROM, "Expected 'from' in summon statement");
+    const moduleToken = this.expect(TokenType.STRING, "Expected module path string");
+    const modulePath = typeof moduleToken.value === 'string' ? moduleToken.value : moduleToken.value.parts.map(p => p.value).join('');
+    this.consumeStatementEnd();
+    return { type: 'SummonStmt', imports, module: modulePath, destructured, line: token.line };
+  }
+
+  // //! battle cry comment
+  parseBattlecry() {
+    const token = this.advance(); // consume BATTLECRY
+    this.consumeStatementEnd();
+    return { type: 'BattlecryStmt', text: token.value, line: token.line };
   }
 
   // { statements }

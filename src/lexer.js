@@ -13,6 +13,7 @@ const TokenType = {
   TRUE: 'TRUE', FALSE: 'FALSE', NULL: 'NULL',
   AND: 'AND', OR: 'OR', NOT: 'NOT',
   AWAIT: 'AWAIT', ASYNC: 'ASYNC',
+  ENCORE: 'ENCORE', HEADBANG: 'HEADBANG', SUMMON: 'SUMMON',
 
   // Literals
   NUMBER: 'NUMBER', STRING: 'STRING', IDENTIFIER: 'IDENTIFIER',
@@ -45,6 +46,7 @@ const TokenType = {
   COMMA: 'COMMA', DOT: 'DOT', COLON: 'COLON', SEMICOLON: 'SEMICOLON',
 
   // Special
+  BATTLECRY: 'BATTLECRY',   // //! comment
   EOF: 'EOF',
   NEWLINE: 'NEWLINE',
 };
@@ -60,6 +62,7 @@ const KEYWORDS = {
   return: TokenType.RETURN, true: TokenType.TRUE, false: TokenType.FALSE,
   null: TokenType.NULL, and: TokenType.AND, or: TokenType.OR,
   not: TokenType.NOT, await: TokenType.AWAIT, async: TokenType.ASYNC,
+  encore: TokenType.ENCORE, headbang: TokenType.HEADBANG, summon: TokenType.SUMMON,
 };
 
 class Token {
@@ -118,9 +121,22 @@ function tokenize(source) {
       continue;
     }
 
-    // Single-line comment
+    // Single-line comment (or battle cry //!)
     if (ch === '/' && peek(1) === '/') {
-      while (pos < source.length && source[pos] !== '\n') advance();
+      const commentStart = pos;
+      const commentLine = line;
+      const commentCol = col;
+      advance(); advance(); // skip //
+      if (pos < source.length && source[pos] === '!') {
+        advance(); // skip !
+        // Skip whitespace after //!
+        while (pos < source.length && source[pos] === ' ') advance();
+        let cry = '';
+        while (pos < source.length && source[pos] !== '\n') cry += advance();
+        tokens.push(new Token(TokenType.BATTLECRY, cry.trim(), commentLine, commentCol));
+      } else {
+        while (pos < source.length && source[pos] !== '\n') advance();
+      }
       continue;
     }
 

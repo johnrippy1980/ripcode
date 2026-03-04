@@ -1,0 +1,34 @@
+// easter-eggs.rip — Hidden surprises in RipCode
+
+//! LET'S GOOOOO
+//! this language SHREDS
+
+// The meaning of life
+forge _meaning_of_life = 43
+forge the_real_meaning_of_life = 42
+
+// Headbang — the no-op
+say "Starting the show..."
+headbang
+headbang
+headbang
+say "Done headbanging."
+
+// Say the magic number
+say 42
+
+// Summon from the void (alt import syntax)
+// summon { readFileSync } from "fs"
+
+// Encore — repeat yourself!
+say "Encore! Encore!"
+encore
+
+// Scream auto-caps everything
+scream "this should be all caps because we are screaming"
+
+// Battle cries survive transpilation:
+//! DESTROY ALL SEMICOLONS
+//! METAL IS NOT DEAD
+
+say "Check the transpiled output for surprises!"
