@@ -14,8 +14,9 @@ const {
   WELCOME, VERSION_TAGLINES, GOLDEN_BANNER, BUILD_CELEBRATIONS,
 } = require('../src/ascii');
 const { isFirstRun, markFirstRunComplete } = require('../src/firstrun');
+const { getHolidayMessage } = require('../src/holidays');
 
-const VERSION = '0.2.0';
+const VERSION = '0.2.1';
 
 const BANNER = `
    ____  _       ____          _
@@ -49,6 +50,12 @@ function main() {
   if (isFirstRun()) {
     console.log(WELCOME);
     markFirstRunComplete();
+  }
+
+  // Holiday easter eggs
+  const holiday = getHolidayMessage();
+  if (holiday) {
+    holiday.message.forEach(line => console.log(line));
   }
 
   if (!command || command === 'help') {
