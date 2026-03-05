@@ -203,8 +203,63 @@ forge math = "2 + 2 = ${2 + 2}"
 | `rip run <file.rip>` | Transpile and execute |
 | `rip build <file.rip> [-o out.js]` | Transpile to JavaScript |
 | `rip init [name]` | Scaffold a new project |
+| `rip repl` | Interactive RipCode REPL |
 | `rip version` | Show version |
 | `rip help` | Show help |
+
+## Hidden Commands
+
+RipCode has 35 easter eggs baked in. Here are the ones we'll admit to:
+
+| Command | What it does |
+|---------|-------------|
+| `rip solo` | Animated ASCII guitar solo |
+| `rip lore` | Typewriter-style origin story |
+| `rip noise` | Visual hierarchy of noise levels |
+| `rip 666` | Number of the Beast Mode |
+| `rip credits` | Movie-style rolling credits |
+| `rip unleash` | Opens the Actor Arsenal |
+| `rip quake` | Plays the Quake theme (macOS, caches on first use) |
+| `rip hierarchy` | DOOM-style boss health bars for your project |
+| `rip battle <f1> <f2>` | Two .rip files fight in a 6-round tournament |
+| `rip sacrifice <file>` | Dramatic file deletion (recoverable) |
+| `rip resurrect [file]` | Bring a file back from the graveyard |
+| `rip fortune` | Metal fortune cookie |
+| `rip rage <msg>` | Escalating ASCII rage |
+| `rip summon-kenny-g` | The ultimate punishment |
+| `rip roast <file>` | Metric-based code roast |
+| `rip roastme` | Random humor from the rip-on-shit engine |
+| `rip headcount` | How many secrets exist |
+
+There are also date-triggered surprises, a 5% chance of random quips, a Konami code in the REPL, and other things you'll have to find yourself.
+
+## Secret Language Features
+
+```
+// Battle cries — comments that survive transpilation
+//! DESTROY ALL SEMICOLONS
+
+// Headbang — the metal no-op
+headbang
+
+// Encore — repeat the previous statement
+say "Hello!"
+encore
+
+// Summon — alt import syntax
+summon { readFileSync } from "fs"
+
+// Scream auto-caps at runtime
+scream "this becomes ALL CAPS"
+
+// The answer to everything
+say 42    // prints: 42 (The Answer)
+
+// The meaning of life
+forge _meaning_of_life = 43   // transpiler adds: /* are you sure? */
+```
+
+Every transpiled file ends with `// Forged with RipCode 🤘`
 
 ## Full Cheat Sheet
 
@@ -252,6 +307,7 @@ Check out the `examples/` directory:
 - `pipeline.rip` — Data pipelines with `~>`
 - `mosh.rip` — Loops, conditionals, grade report
 - `full-demo.rip` — Complete feature showcase
+- `easter-eggs.rip` — Hidden language features showcase
 
 ## How It Works
 
