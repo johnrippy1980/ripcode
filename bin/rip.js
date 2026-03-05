@@ -17,7 +17,7 @@ const { isFirstRun, markFirstRunComplete } = require('../src/firstrun');
 const { getHolidayMessage } = require('../src/holidays');
 const { getRandomRoast, getRandomLongRoast } = require('../src/roasts');
 
-const VERSION = '0.3.1';
+const VERSION = '0.3.2';
 
 const BANNER = `
    ____  _       ____          _
