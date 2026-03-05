@@ -15,8 +15,9 @@ const {
 } = require('../src/ascii');
 const { isFirstRun, markFirstRunComplete } = require('../src/firstrun');
 const { getHolidayMessage } = require('../src/holidays');
+const { getRandomRoast, getRandomLongRoast } = require('../src/roasts');
 
-const VERSION = '0.3.0';
+const VERSION = '0.3.1';
 
 const BANNER = `
    ____  _       ____          _
@@ -66,6 +67,12 @@ function main() {
     }
   }
 
+  // 5% chance random quip on any command
+  if (command && command !== 'roastme' && Math.random() < 0.05) {
+    console.log(`\x1b[2m  \u{1F3A4} ${getRandomRoast()}\x1b[0m`);
+    console.log('');
+  }
+
   if (!command || command === 'help') {
     // 1/50 chance golden banner
     if (Math.random() < 0.02) {
@@ -99,6 +106,7 @@ function main() {
     case 'summon-kenny-g': return cmdKennyG();
     case 'roast': return cmdRoast(args.slice(1));
     case 'headcount': return cmdHeadcount();
+    case 'roastme': return cmdRoastMe();
     case 'rip':
       // "rip rip" = 2nd rip, check for 3rd
       if (args[1] === 'rip') return cmdBeetlejuice();
@@ -1044,12 +1052,13 @@ function cmdRoast(args) {
 // ============================================================
 
 function cmdHeadcount() {
-  const total = 33;
+  const total = 35;
   const known = [
     'rip solo', 'rip lore', 'rip noise', 'rip 666', 'rip credits',
     'rip unleash', 'rip quake', 'rip hierarchy', 'rip battle',
     'rip repl', 'rip sacrifice', 'rip resurrect', 'rip fortune',
     'rip rage', 'rip summon-kenny-g', 'rip roast', 'rip headcount',
+    'rip roastme',
   ];
   const hidden = total - known.length;
 
@@ -1090,6 +1099,35 @@ function cmdBeetlejuice() {
   console.log('       \\__/\x1b[0m');
   console.log('');
   console.log('\x1b[32m  "It\'s showtime!"\x1b[0m');
+  console.log('');
+}
+
+// ============================================================
+//  rip roastme — random humor from the rip-on-shit engine
+// ============================================================
+
+function cmdRoastMe() {
+  // 30% chance of a long-form roast, 70% quick hit
+  const isLong = Math.random() < 0.3;
+
+  console.log('');
+  console.log('\x1b[31m\x1b[1m  \u{1F3A4} RIP ON SHIT \u{1F3A4}\x1b[0m');
+  console.log('\x1b[2m  ────────────────────────────────\x1b[0m');
+  console.log('');
+
+  if (isLong) {
+    const roast = getRandomLongRoast();
+    const lines = roast.split('\n');
+    for (const line of lines) {
+      console.log(`\x1b[33m  ${line}\x1b[0m`);
+    }
+  } else {
+    const roast = getRandomRoast();
+    console.log(`\x1b[33m  "${roast}"\x1b[0m`);
+  }
+
+  console.log('');
+  console.log('\x1b[2m  Powered by rip-on-shit \u{1F918}\x1b[0m');
   console.log('');
 }
 
